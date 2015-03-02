@@ -46,6 +46,10 @@ public class Clickable : MonoBehaviour {
 			}
 			Destroy (this.gameObject);
 		} 
+		Vector3 newScale = transform.localScale;
+		newScale.x *= 0.9f;
+		newScale.y *= 0.9f;
+		transform.localScale = newScale;
 
 	}
 
