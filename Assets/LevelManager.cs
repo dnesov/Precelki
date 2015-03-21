@@ -51,7 +51,8 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+			Application.LoadLevel ("main_menu");
 	}
 
 	void SphereClicked(GameObject sphere)
@@ -62,6 +63,8 @@ public class LevelManager : MonoBehaviour {
 			currentBalls--;
 			if(currentBalls > 0)
 				SetBackgroundColor();
+			else
+				Application.LoadLevel ("main_menu");
 
 		}
 
