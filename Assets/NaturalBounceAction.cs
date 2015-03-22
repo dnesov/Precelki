@@ -36,17 +36,18 @@ public class NaturalBounceAction : MonoBehaviour {
 		}
 		
 		Vector3 tmp;
-		Debug.Log (curState + " " + (Time.time - startTime) + " " + ContactTime);
+		//Debug.Log (curState + " " + (Time.time - startTime) + " " + ContactTime);
 		
 		switch(curState) {
 			case BounceState.Attack:
-				tmp = transform.localScale;
+			tmp = transform.parent.transform.localScale;
+				Debug.Log(bounceAxis);
 				if(bounceAxis == BounceAxis.Horizontal)
-					tmp.y = Mathf.Lerp(keptScale, maxSqueeze, (Time.time - startTime) / (ContactTime/2.0f));
-				else
 					tmp.x = Mathf.Lerp(keptScale, maxSqueeze, (Time.time - startTime) / (ContactTime/2.0f));
+				else
+					tmp.y = Mathf.Lerp(keptScale, maxSqueeze, (Time.time - startTime) / (ContactTime/2.0f));
 				
-				transform.localScale = tmp;
+			transform.parent.transform.localScale = tmp;
 				
 				if( curState == BounceState.Attack && (Time.time - startTime) >= ContactTime / 2.0f ) {
 					curState = BounceState.Decay;
@@ -57,14 +58,14 @@ public class NaturalBounceAction : MonoBehaviour {
 				break;
 				
 			case BounceState.Decay:
-				tmp = transform.localScale;
+			tmp = transform.parent.transform.localScale;
 				
 				if(bounceAxis == BounceAxis.Horizontal)
-					tmp.y = Mathf.Lerp(maxSqueeze, keptScale, (Time.time - startTime) / (ContactTime/2.0f));
-				else
 					tmp.x = Mathf.Lerp(maxSqueeze, keptScale, (Time.time - startTime) / (ContactTime/2.0f));
+				else
+					tmp.y = Mathf.Lerp(maxSqueeze, keptScale, (Time.time - startTime) / (ContactTime/2.0f));
 				
-				transform.localScale = tmp;
+			transform.parent.transform.localScale = tmp;
 				
 				if(Time.time - startTime >= ContactTime )
 					curState = BounceState.Release;
@@ -96,23 +97,23 @@ public class NaturalBounceAction : MonoBehaviour {
 		rigidbody2D.velocity = Vector2.zero;
 		rigidbody2D.angularVelocity = 0;
 		rigidbody2D.gravityScale = 0;
-		
-		maxSqueeze = 0.5f;
-		
+				
 		curState = BounceState.Attack;
 		
-		rigidbody2D.centerOfMass = coll.contacts[0].point;
+		//rigidbody2D.centerOfMass = coll.contacts[0].point;
 		
-		Debug.Log(rigidbody2D.centerOfMass);
+		//Debug.Log(rigidbody2D.centerOfMass);
 		
 		if( Mathf.Abs(coll.contacts[0].point.x - transform.position.x) > 
 		   Mathf.Abs(coll.contacts[0].point.y - transform.position.y) ) {
 			 	bounceAxis = BounceAxis.Horizontal;
-			 	keptScale = transform.localScale.y;
+			keptScale = transform.parent.transform.localScale.y;
 			 } else {
 				bounceAxis = BounceAxis.Vertical;
-				keptScale = transform.localScale.x;
+			keptScale = transform.parent.transform.localScale.x;
 		}
+		
+		maxSqueeze = 0.5f * keptScale;
 	}
 	
 	void OnCollisionExit2D(Collision2D coll) {
