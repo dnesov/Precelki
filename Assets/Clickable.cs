@@ -7,7 +7,7 @@ public class Clickable : MonoBehaviour {
 	Transform sphere;
 
 	void Start () {
-		rigidbody2D.AddForce (new Vector2 (Random.Range (-150f, 150f), Random.Range (-300f, 300f) * 2));
+		GetComponent<Rigidbody2D>().AddForce (new Vector2 (Random.Range (-150f, 150f), Random.Range (-300f, 300f) * 2));
 		//renderer.material.color = ClickHandler.colors [Random.Range (0, 3)];
 		
 		//Vector3 myScreen = new Vector3(Screen.width,Screen.height,0);
@@ -21,7 +21,7 @@ public class Clickable : MonoBehaviour {
 
 	public void SetColor(Color color)
 	{
-		renderer.material.color = color;
+		GetComponent<Renderer>().material.color = color;
 	}
 	
 	// Update is called once per frame
@@ -69,8 +69,8 @@ public class Clickable : MonoBehaviour {
 	void OnCollisionStay2D(Collision2D col)
 	{
 		if (col.gameObject.tag == "Floor") {
-			if (rigidbody2D.velocity.y < 10) {
-				rigidbody2D.AddForce (new Vector2 (Random.Range (-100f, 100f), Random.Range (500f, 700f)));
+			if (GetComponent<Rigidbody2D>().velocity.y < 10) {
+				GetComponent<Rigidbody2D>().AddForce (new Vector2 (Random.Range (-100f, 100f), Random.Range (500f, 700f)));
 			}
 		}
 	}

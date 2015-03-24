@@ -33,11 +33,11 @@ public class LevelManager : MonoBehaviour {
 	void CreateBalls()
 	{
 
-		float minX = - myWorld.x + ball.collider2D.bounds.size.x / 2;
-		float maxX = myWorld.x - ball.collider2D.bounds.size.x / 2;
+		float minX = - myWorld.x + ball.GetComponent<Collider2D>().bounds.size.x / 2;
+		float maxX = myWorld.x - ball.GetComponent<Collider2D>().bounds.size.x / 2;
 
-		float minY = - myWorld.y + ball.collider2D.bounds.size.y / 2;
-		float maxY = myWorld.y - ball.collider2D.bounds.size.y / 2;
+		float minY = - myWorld.y + ball.GetComponent<Collider2D>().bounds.size.y / 2;
+		float maxY = myWorld.y - ball.GetComponent<Collider2D>().bounds.size.y / 2;
 		for(int i = 0; i < initialBalls; i++)
 		{
 			Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
@@ -57,8 +57,8 @@ public class LevelManager : MonoBehaviour {
 
 	void SphereClicked(GameObject sphere)
 	{
-		if (sphere.renderer.material.color == background.renderer.material.color) {
-			colorsCounter[System.Array.IndexOf(colors, sphere.renderer.material.color)]--;
+		if (sphere.GetComponent<Renderer>().material.color == background.GetComponent<Renderer>().material.color) {
+			colorsCounter[System.Array.IndexOf(colors, sphere.GetComponent<Renderer>().material.color)]--;
 			Destroy(sphere);
 			currentBalls--;
 			if(currentBalls > 0)
@@ -77,7 +77,7 @@ public class LevelManager : MonoBehaviour {
 		do {
 			newColorIndex = Random.Range (0, colorsCounter.Length);
 		} while(colorsCounter[newColorIndex] == 0);
-		background.renderer.material.color = colors [newColorIndex];
+		background.GetComponent<Renderer>().material.color = colors [newColorIndex];
 	}
 
 	void SetupWorldSize()
