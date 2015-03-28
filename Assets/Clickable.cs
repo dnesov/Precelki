@@ -4,6 +4,8 @@ using System.Collections;
 public class Clickable : MonoBehaviour {
 	Vector3 myWorld;
 
+	public BallType type;
+
 	Transform sphere;
 
 	void Start () {
@@ -17,6 +19,14 @@ public class Clickable : MonoBehaviour {
 		//rigidbody2D.AddForce (new Vector2 (Random.Range (-150f, 150f), Random.Range (-300f, 300f) * 2));
 		//count+=1;
 		//AdjustColor();
+	}
+	
+	public void SetSprite(Sprite sprite)
+	{
+		//transform.bounds.size.Set(transform.localScale.x, transform.localScale.y, transform.localScale.z);
+		transform.localScale = GetComponent<CircleCollider2D>().transform.localScale;
+		//sprite.bounds.size.Set(GetComponent<CircleCollider2D>().bounds.size.x, GetComponent<CircleCollider2D>().bounds.size.y, GetComponent<CircleCollider2D>().bounds.size.z); //= GetComponent<CircleCollider2D>().bounds;
+		GetComponent<SpriteRenderer>().sprite = sprite;
 	}
 
 	public void SetColor(Color color)

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviour {
 
-	public Color[] colors;
 	public Transform background;
 	public int initialBalls;
 
@@ -11,28 +11,27 @@ public class LevelManager : MonoBehaviour {
 	int currentBalls;
 	Vector3 myWorld;
 	Transform ball;
-
-	int[] colorsCounter;
+	List<Clickable> balls;
+	
+	BallManager ballManager;
 
 	// Use this for initialization
 	void Start () {
 		clickHandler = gameObject.AddComponent<ClickHandler>() as ClickHandler;
 		clickHandler.SphereClicked += new ClickHandler.SphereClickHandler (SphereClicked);
-
+		ballManager = new BallManager();
 		ball = ((GameObject)Resources.Load("Sphere")).transform;
 
 		SetupWorldSize ();
 		CreateBorders ();
 
-		colorsCounter = new int[colors.Length];
 		CreateBalls ();
 		SetBackgroundColor ();
-		//background.renderer.material.color = colors[Random.Range(0,colors.Length)];
 	}
 
 	void CreateBalls()
 	{
-
+		balls = new List<Clickable>();
 		float minX = - myWorld.x + ball.GetComponent<Collider2D>().bounds.size.x / 2;
 		float maxX = myWorld.x - ball.GetComponent<Collider2D>().bounds.size.x / 2;
 
@@ -42,9 +41,10 @@ public class LevelManager : MonoBehaviour {
 		{
 			Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
 			Transform newBall = (Transform)Instantiate (ball, ballPos, Quaternion.identity);
-			int newColor = Random.Range(0, colors.Length);
-			colorsCounter[newColor]++;
-			(newBall.GetComponent<Clickable>() as Clickable).SetColor(colors[newColor]);
+			BallType newType = ballManager.GetRndType();
+			(newBall.GetComponent<Clickable>() as Clickable).type = newType;
+			(newBall.GetComponent<Clickable>() as Clickable).SetSprite(ballManager.GetRndFace(newType));
+			balls.Add(newBall.GetComponent<Clickable>() as Clickable);
 		}
 		currentBalls = initialBalls;
 	}
@@ -57,8 +57,9 @@ public class LevelManager : MonoBehaviour {
 
 	void SphereClicked(GameObject sphere)
 	{
-		if (sphere.GetComponent<Renderer>().material.color == background.GetComponent<Renderer>().material.color) {
-			colorsCounter[System.Array.IndexOf(colors, sphere.GetComponent<Renderer>().material.color)]--;
+		
+		if (ballManager.GetBackground(sphere.GetComponent<Clickable>().type) == background.GetComponent<Renderer>().material.color) {
+			balls.Remove(sphere.GetComponent<Clickable>());
 			Destroy(sphere);
 			currentBalls--;
 			if(currentBalls > 0)
@@ -73,11 +74,7 @@ public class LevelManager : MonoBehaviour {
 
 	void SetBackgroundColor()
 	{
-		int newColorIndex;// =;
-		do {
-			newColorIndex = Random.Range (0, colorsCounter.Length);
-		} while(colorsCounter[newColorIndex] == 0);
-		background.GetComponent<Renderer>().material.color = colors [newColorIndex];
+		background.GetComponent<Renderer>().material.color = ballManager.GetBackground(balls[Random.Range(0, balls.Count - 1)].type);
 	}
 
 	void SetupWorldSize()
