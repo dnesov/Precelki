@@ -8,19 +8,19 @@ public class LevelManager : MonoBehaviour {
 	public int initialBalls;
 
 	private ClickHandler clickHandler;
-	int currentBalls;
 	Vector3 myWorld;
-	Transform ball;
-	List<Clickable> balls;
+	Transform referenceBall;
+	private List<BallType> currentBallTypes;
+	private BallType backgroundType;
 	
 	BallManager ballManager;
 
 	// Use this for initialization
 	void Start () {
-		clickHandler = gameObject.AddComponent<ClickHandler>() as ClickHandler;
+		clickHandler = gameObject.AddComponent<ClickHandler>();
 		clickHandler.SphereClicked += new ClickHandler.SphereClickHandler (SphereClicked);
 		ballManager = new BallManager();
-		ball = ((GameObject)Resources.Load("Sphere")).transform;
+		referenceBall = ((GameObject)Resources.Load("Sphere")).transform;
 
 		SetupWorldSize ();
 		CreateBorders ();
@@ -31,22 +31,21 @@ public class LevelManager : MonoBehaviour {
 
 	void CreateBalls()
 	{
-		balls = new List<Clickable>();
-		float minX = - myWorld.x + ball.GetComponent<Collider2D>().bounds.size.x / 2;
-		float maxX = myWorld.x - ball.GetComponent<Collider2D>().bounds.size.x / 2;
+		currentBallTypes = new List<BallType>();
+		float minX = - myWorld.x + referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
+		float maxX = myWorld.x - referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
 
-		float minY = - myWorld.y + ball.GetComponent<Collider2D>().bounds.size.y / 2;
-		float maxY = myWorld.y - ball.GetComponent<Collider2D>().bounds.size.y / 2;
+		float minY = - myWorld.y + referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
+		float maxY = myWorld.y - referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
 		for(int i = 0; i < initialBalls; i++)
 		{
 			Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
-			Transform newBall = (Transform)Instantiate (ball, ballPos, Quaternion.identity);
+			Transform newBall = (Transform)Instantiate (referenceBall, ballPos, Quaternion.identity);
 			BallType newType = ballManager.GetRndType();
-			(newBall.GetComponent<Clickable>() as Clickable).type = newType;
-			(newBall.GetComponent<Clickable>() as Clickable).SetSprite(ballManager.GetRndFace(newType));
-			balls.Add(newBall.GetComponent<Clickable>() as Clickable);
+			newBall.GetComponent<Clickable>().type = newType;
+			newBall.GetComponent<Clickable>().SetSprite(ballManager.GetRndFace(newType));
+			currentBallTypes.Add(newType);
 		}
-		currentBalls = initialBalls;
 	}
 	
 	// Update is called once per frame
@@ -57,24 +56,20 @@ public class LevelManager : MonoBehaviour {
 
 	void SphereClicked(GameObject sphere)
 	{
-		
-		if (ballManager.GetBackground(sphere.GetComponent<Clickable>().type) == background.GetComponent<Renderer>().material.color) {
-			balls.Remove(sphere.GetComponent<Clickable>());
+		if (sphere.GetComponent<Clickable>().type == backgroundType) {
 			Destroy(sphere);
-			currentBalls--;
-			if(currentBalls > 0)
+			currentBallTypes.Remove(backgroundType);
+			if(currentBallTypes.Count > 0)
 				SetBackgroundColor();
 			else
 				Application.LoadLevel ("main_menu");
-
 		}
-
-		print ("bah!");
 	}
 
 	void SetBackgroundColor()
 	{
-		background.GetComponent<Renderer>().material.color = ballManager.GetBackground(balls[Random.Range(0, balls.Count - 1)].type);
+		backgroundType = currentBallTypes [Random.Range (0, currentBallTypes.Count - 1)];
+		background.GetComponent<Renderer>().material.color = ballManager.GetBackground(backgroundType);
 	}
 
 	void SetupWorldSize()

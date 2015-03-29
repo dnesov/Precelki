@@ -13,7 +13,6 @@ class BallData {
 	
 	public BallData(string spriteName, Color backCol) {
 		faces = Resources.LoadAll<Sprite> (spriteName);
-		Debug.Log(faces.Length);
 		background = backCol;
 	}
 }
@@ -40,16 +39,13 @@ public class BallManager
 	}
 	
 	public Sprite GetRndFace(BallType type) {
-		Debug.Log(type);
 		int index = UnityEngine.Random.Range(0, ColorMap[type].faces.Length);
-		Debug.Log(index);
 		return ColorMap[type].faces[index];
 	}
 	
 	public BallType GetRndType()
 	{
 		var enumValues = Enum.GetValues(typeof(BallType));
-		//int enumSize = Enum.GetNames(typeof(MyEnum)).Length;
 		return (BallType)enumValues.GetValue(UnityEngine.Random.Range(0, enumValues.Length));
 	}
 }
