@@ -14,6 +14,11 @@ public class LevelManager : MonoBehaviour {
 	private BallType backgroundType;
 	
 	private BallManager ballManager;
+	
+	private float minX;
+	private float maxX;
+	private float minY;
+	private float maxY;
 
 	// Use this for initialization
 	void Start () {
@@ -32,20 +37,30 @@ public class LevelManager : MonoBehaviour {
 	void CreateBalls()
 	{
 		currentBallTypes = new List<BallType>();
-		float minX = - myWorld.x + referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
-		float maxX = myWorld.x - referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
-
-		float minY = - myWorld.y + referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
-		float maxY = myWorld.y - referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
+		
+		minX = - myWorld.x + referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
+		maxX = myWorld.x - referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
+		
+		minY = - myWorld.y + referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
+		maxY = myWorld.y - referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
+		
 		for(int i = 0; i < initialBalls; i++)
 		{
-			Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
-			Transform newBall = (Transform)Instantiate (referenceBall, ballPos, Quaternion.identity);
-			BallType newType = ballManager.GetRndType();
-			newBall.GetComponent<Clickable>().type = newType;
-			newBall.GetComponent<Clickable>().SetSprite(ballManager.GetRndFace(newType));
-			currentBallTypes.Add(newType);
+			SpawnRandomBall();
 		}
+	}
+	void SpawnRandomBall() {
+		Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
+		BallType type = ballManager.GetRndType();
+		SpawnBall (ballPos, type);
+	}
+	
+	void SpawnBall(Vector3 position, BallType type) {
+		Transform newBall = (Transform)Instantiate (referenceBall, position, Quaternion.identity);
+		
+		newBall.GetComponent<Clickable>().type = type;
+		newBall.GetComponent<Clickable>().SetSprite(ballManager.GetRndFace(type));
+		currentBallTypes.Add(type);
 	}
 	
 	// Update is called once per frame
@@ -56,13 +71,19 @@ public class LevelManager : MonoBehaviour {
 
 	void SphereClicked(GameObject sphere)
 	{
-		if (sphere.GetComponent<Clickable>().type == backgroundType) {
-			Destroy(sphere);
-			currentBallTypes.Remove(backgroundType);
+		Vector3 position = sphere.transform.position;
+		BallType type = sphere.GetComponent<Clickable>().type;
+		currentBallTypes.Remove(type);
+		Destroy(sphere);
+		
+		if (type == backgroundType) {
 			if(currentBallTypes.Count > 0)
 				SetBackgroundColor();
 			else
 				Application.LoadLevel ("main_menu");
+		} else {
+			SpawnBall(position, type);
+			SpawnBall(position, type);
 		}
 	}
 
