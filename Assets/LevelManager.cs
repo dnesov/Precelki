@@ -5,20 +5,17 @@ using System.Collections.Generic;
 public class LevelManager : MonoBehaviour {
 
 	public Transform background;
+	public Transform menuBar;
 	public int initialBalls;
+	private const float boardOffset = 2;
 
 	private ClickHandler clickHandler;
-	private Vector3 myWorld;
 	private Transform referenceBall;
 	private List<BallType> currentBallTypes;
 	private BallType backgroundType;
 	
 	private BallManager ballManager;
-	
-	private float minX;
-	private float maxX;
-	private float minY;
-	private float maxY;
+	private Bounds gameBoard;
 
 	// Use this for initialization
 	void Start () {
@@ -28,7 +25,6 @@ public class LevelManager : MonoBehaviour {
 		referenceBall = ((GameObject)Resources.Load("Sphere")).transform;
 
 		SetupWorldSize ();
-		CreateBorders ();
 
 		CreateBalls ();
 		SetBackgroundColor ();
@@ -38,19 +34,12 @@ public class LevelManager : MonoBehaviour {
 	{
 		currentBallTypes = new List<BallType>();
 		
-		minX = - myWorld.x + referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
-		maxX = myWorld.x - referenceBall.GetComponent<Collider2D>().bounds.size.x / 2;
-		
-		minY = - myWorld.y + referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
-		maxY = myWorld.y - referenceBall.GetComponent<Collider2D>().bounds.size.y / 2;
-		
 		for(int i = 0; i < initialBalls; i++)
-		{
 			SpawnRandomBall();
-		}
 	}
+	
 	void SpawnRandomBall() {
-		Vector3 ballPos = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
+		Vector3 ballPos = new Vector3(Random.Range(gameBoard.min.x, gameBoard.max.x), Random.Range(gameBoard.min.y, gameBoard.max.y), 0);
 		BallType type = ballManager.GetRndType();
 		SpawnBall (ballPos, type);
 	}
@@ -89,24 +78,30 @@ public class LevelManager : MonoBehaviour {
 
 	void SetBackgroundColor()
 	{
-		backgroundType = currentBallTypes [Random.Range (0, currentBallTypes.Count - 1)];
+		backgroundType = currentBallTypes [Random.Range (0, currentBallTypes.Count)];
 		background.GetComponent<Renderer>().material.color = ballManager.GetBackground(backgroundType);
 	}
 
 	void SetupWorldSize()
 	{
 		Vector3 myScreen = new Vector3(Screen.width, Screen.height, 0);
-		myWorld = Camera.main.ScreenToWorldPoint(myScreen);
-		background.transform.localScale = new Vector3(myWorld.x*2, myWorld.y*2, 1.0f);
-	}
-
-	void CreateBorders()
-	{
-		Vector2[] points = new Vector2[] { new Vector2 (-myWorld.x, -myWorld.y),
-			new Vector2 (myWorld.x, -myWorld.y),
-			new Vector2 (myWorld.x, myWorld.y),
-			new Vector2 (-myWorld.x, myWorld.y),
-			new Vector2 (-myWorld.x, -myWorld.y)};
-		gameObject.GetComponent<EdgeCollider2D>().points = points;
+		Vector3 myWorld = Camera.main.ScreenToWorldPoint(myScreen);
+		
+		gameBoard.SetMinMax(
+			new Vector3(-myWorld.x, -myWorld.y, 0),
+			new Vector3(myWorld.x, myWorld.y - boardOffset, 0));
+			
+		background.transform.localScale = new Vector3(myWorld.x*2, (myWorld.y - boardOffset * 0.5f)*2, 1.0f);
+		background.transform.position = new Vector3(0, -(boardOffset * 0.5f), 6.5f);
+		
+		menuBar.transform.localScale = new Vector3(myWorld.x*2, boardOffset, 1.0f);
+		menuBar.transform.position = new Vector3(0, gameBoard.max.y + boardOffset * 0.5f, 6.5f);
+		
+		gameObject.GetComponent<EdgeCollider2D>().points = new Vector2[] {
+			new Vector2 (gameBoard.min.x, gameBoard.min.y),
+			new Vector2 (gameBoard.max.x, gameBoard.min.y),
+			new Vector2 (gameBoard.max.x, gameBoard.max.y),
+			new Vector2 (gameBoard.min.x, gameBoard.max.y),
+			new Vector2 (gameBoard.min.x, gameBoard.min.y)};
 	}
 }

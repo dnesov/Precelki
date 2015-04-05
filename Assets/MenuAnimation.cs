@@ -15,10 +15,14 @@ public class MenuAnimation : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		blueFace.transform.localScale = new Vector3(0.3f, 0.3f, 0) * lerp(1.0f);
-		greenFace.transform.localScale = new Vector3(0.3f, 0.3f, 0) * lerp(0.0f);
-		orangeFace.transform.localScale = new Vector3(0.3f, 0.3f, 0) * lerp(1.0f);
-		redFace.transform.localScale = new Vector3(0.3f, 0.3f, 0) * lerp(0.0f);
+		blueFace.transform.localScale = newScale(1.0f);
+		greenFace.transform.localScale = newScale(0.0f);
+		orangeFace.transform.localScale = newScale(1.0f);
+		redFace.transform.localScale = newScale(0.0f);
+	}
+	
+	private Vector3 newScale(float offset) {
+		return new Vector3(0.3f, 0.3f, 0) * lerp(offset);
 	}
 	
 	private float lerp(float offset) {

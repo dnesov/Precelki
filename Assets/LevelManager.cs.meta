@@ -1,8 +1,14 @@
 fileFormatVersion: 2
 guid: d139e3812c6e4754cb8f2329594b3a34
+timeCreated: 1428248068
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - background: {instanceID: 0}
+  - menuBar: {fileID: 141488, guid: a479f4c8f0be634468b9f0cf4b884167, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 
