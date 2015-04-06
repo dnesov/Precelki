@@ -6,8 +6,11 @@ public class LevelManager : MonoBehaviour {
 
 	public Transform background;
 	public Transform menuBar;
+	public Transform menuButton;
+	
 	public int initialBalls;
-	private const float boardOffset = 2;
+	private const float menuBarHeight = 2;
+	private bool isPause = false;
 
 	private ClickHandler clickHandler;
 	private Transform referenceBall;
@@ -60,6 +63,9 @@ public class LevelManager : MonoBehaviour {
 
 	void SphereClicked(GameObject sphere)
 	{
+		if (isPause)
+			return;
+		
 		Vector3 position = sphere.transform.position;
 		BallType type = sphere.GetComponent<Clickable>().type;
 		currentBallTypes.Remove(type);
@@ -89,13 +95,16 @@ public class LevelManager : MonoBehaviour {
 		
 		gameBoard.SetMinMax(
 			new Vector3(-myWorld.x, -myWorld.y, 0),
-			new Vector3(myWorld.x, myWorld.y - boardOffset, 0));
+			new Vector3(myWorld.x, myWorld.y - menuBarHeight, 0));
 			
-		background.transform.localScale = new Vector3(myWorld.x*2, (myWorld.y - boardOffset * 0.5f)*2, 1.0f);
-		background.transform.position = new Vector3(0, -(boardOffset * 0.5f), 6.5f);
+		background.transform.localScale = new Vector3(myWorld.x*2, (myWorld.y - menuBarHeight * 0.5f)*2, 1.0f);
+		background.transform.position = new Vector3(0, -(menuBarHeight * 0.5f), 6.5f);
 		
-		menuBar.transform.localScale = new Vector3(myWorld.x*2, boardOffset, 1.0f);
-		menuBar.transform.position = new Vector3(0, gameBoard.max.y + boardOffset * 0.5f, 6.5f);
+		menuBar.transform.localScale = new Vector3(myWorld.x*2, menuBarHeight, 1.0f);
+		menuBar.transform.position = new Vector3(0, gameBoard.max.y + menuBarHeight * 0.5f, 6.5f);
+		
+		menuButton.transform.position = new Vector3(gameBoard.max.x - 1, menuBar.transform.position.y);
+		menuButton.transform.localScale = new Vector3(0.2f, 0.2f);
 		
 		gameObject.GetComponent<EdgeCollider2D>().points = new Vector2[] {
 			new Vector2 (gameBoard.min.x, gameBoard.min.y),
@@ -103,5 +112,30 @@ public class LevelManager : MonoBehaviour {
 			new Vector2 (gameBoard.max.x, gameBoard.max.y),
 			new Vector2 (gameBoard.min.x, gameBoard.max.y),
 			new Vector2 (gameBoard.min.x, gameBoard.min.y)};
+	}
+	
+	public void menuButtonClicked() {
+		isPause = !isPause;
+		if (isPause) {
+			Time.timeScale = 0;
+		} else {
+			Time.timeScale = 1;
+		}
+	}
+	
+	void OnGUI() {
+		if (isPause) {
+			Vector3 leftTop = Camera.main.WorldToScreenPoint(new Vector3(gameBoard.min.x, gameBoard.min.y + menuBarHeight));
+			Vector3 rightBottom = Camera.main.WorldToScreenPoint(new Vector3(gameBoard.max.x, gameBoard.max.y + menuBarHeight));
+			GUI.Window(
+				0,
+				new Rect(leftTop.x, leftTop.y, rightBottom.x - leftTop.x, rightBottom.y - leftTop.y),
+				displayPauseMenu,
+				"Pause menu");
+		}
+	}
+	
+	void displayPauseMenu(int windowID) {
+		//TODO pause menu contents
 	}
 }

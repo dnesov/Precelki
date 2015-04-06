@@ -22,6 +22,9 @@ public class ButtonEvents : MonoBehaviour {
 		case "quit":
 			Application.Quit();
 			break;
+		case "MenuButton":
+			GameObject.FindObjectOfType<LevelManager>().menuButtonClicked();
+			break;
 		default:
 			break;
 		}
