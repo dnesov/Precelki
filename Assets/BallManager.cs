@@ -20,6 +20,7 @@ class BallData {
 public class BallManager
 {
 	private Dictionary<BallType, BallData> ColorMap;
+	private List<Sprite> backImage;
 
 	public BallManager() {
 		ColorMap = new Dictionary<BallType, BallData>();
@@ -27,6 +28,13 @@ public class BallManager
 		Load (BallType.Blue, "Sprites/faces/blue_faces", 0x7fb6d9);
 		Load (BallType.Green, "Sprites/faces/green_faces", 0xb1f3c3);
 		Load (BallType.Orange, "Sprites/faces/orange_faces", 0xffcd8f);
+		
+		backImage = new List<Sprite>();
+		backImage.Add(Resources.Load<Sprite> ("Sprites/backgrounds/monet0"));
+		backImage.Add(Resources.Load<Sprite> ("Sprites/backgrounds/monet1"));
+		backImage.Add(Resources.Load<Sprite> ("Sprites/backgrounds/monet2"));
+		backImage.Add(Resources.Load<Sprite> ("Sprites/backgrounds/monet3"));
+		backImage.Add(Resources.Load<Sprite> ("Sprites/backgrounds/monet4"));
 	}
 	
 	public void Load(BallType key, string spriteName, int backCol) {
@@ -41,6 +49,11 @@ public class BallManager
 	public Sprite GetRndFace(BallType type) {
 		int index = UnityEngine.Random.Range(0, ColorMap[type].faces.Length);
 		return ColorMap[type].faces[index];
+	}
+	
+	public Sprite GetRndBackImg() {
+		int index = UnityEngine.Random.Range(0, backImage.Count);
+		return backImage[index];
 	}
 	
 	public BallType GetRndType()

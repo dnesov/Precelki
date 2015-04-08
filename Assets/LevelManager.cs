@@ -86,6 +86,7 @@ public class LevelManager : MonoBehaviour {
 	{
 		backgroundType = currentBallTypes [Random.Range (0, currentBallTypes.Count)];
 		background.GetComponent<Renderer>().material.color = ballManager.GetBackground(backgroundType);
+		background.GetComponent<SpriteRenderer>().sprite = ballManager.GetRndBackImg();
 	}
 
 	void SetupWorldSize()
