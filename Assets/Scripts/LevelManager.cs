@@ -7,13 +7,14 @@ public class LevelManager : MonoBehaviour {
 	public Transform background;
 	public Transform menuBar;
 	public Transform menuButton;
+	public Transform referenceBall;
 	
 	public int initialBalls;
 	private const float menuBarHeight = 2;
 	private bool isPause = false;
 
 	private ClickHandler clickHandler;
-	private Transform referenceBall;
+
 	private List<BallType> currentBallTypes;
 	private BallType backgroundType;
 	
@@ -25,7 +26,7 @@ public class LevelManager : MonoBehaviour {
 		clickHandler = gameObject.AddComponent<ClickHandler>();
 		clickHandler.SphereClicked += new ClickHandler.SphereClickHandler (SphereClicked);
 		ballManager = new BallManager();
-		referenceBall = ((GameObject)Resources.Load("Sphere")).transform;
+		//referenceBall = ((GameObject)Resources.Load("Resources/Balls/Sphere")).transform;
 
 		SetupWorldSize ();
 
