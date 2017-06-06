@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour {
 
 	public Transform background;
-	public Transform menuBar;
-	public Transform menuButton;
+	//public Transform menuBar;
+	//public Transform menuButton;
 	public Transform referenceBall;
+    public Text ballCounter;
 	
-	public int initialBalls;
-	private const float menuBarHeight = 2;
+	public int ballCount;
+	private const float menuBarHeight = 0.7f;
 	private bool isPause = false;
 
 	private ClickHandler clickHandler;
@@ -26,7 +29,8 @@ public class LevelManager : MonoBehaviour {
 		clickHandler = gameObject.AddComponent<ClickHandler>();
 		clickHandler.SphereClicked += new ClickHandler.SphereClickHandler (SphereClicked);
 		ballManager = new BallManager();
-		//referenceBall = ((GameObject)Resources.Load("Resources/Balls/Sphere")).transform;
+
+        ballCounter.text = "Balls left:" + ballCount;
 
 		SetupWorldSize ();
 
@@ -38,17 +42,19 @@ public class LevelManager : MonoBehaviour {
 	{
 		currentBallTypes = new List<BallType>();
 		
-		for(int i = 0; i < initialBalls; i++)
+		for(int i = 0; i < ballCount; i++)
 			SpawnRandomBall();
 	}
 	
-	void SpawnRandomBall() {
+	void SpawnRandomBall()
+    {
 		Vector3 ballPos = new Vector3(Random.Range(gameBoard.min.x, gameBoard.max.x), Random.Range(gameBoard.min.y, gameBoard.max.y), 0);
 		BallType type = ballManager.GetRndType();
 		SpawnBall (ballPos, type);
 	}
 	
-	void SpawnBall(Vector3 position, BallType type) {
+	void SpawnBall(Vector3 position, BallType type)
+    {
 		Transform newBall = (Transform)Instantiate (referenceBall, position, Quaternion.identity);
 		
 		newBall.GetComponent<Clickable>().type = type;
@@ -57,9 +63,10 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 		if (Input.GetKeyDown(KeyCode.Escape)) 
-			Application.LoadLevel ("main_menu");
+			SceneManager.LoadScene ("main_menu");
 	}
 
 	void SphereClicked(GameObject sphere)
@@ -68,20 +75,30 @@ public class LevelManager : MonoBehaviour {
 			return;
 		
 		Vector3 position = sphere.transform.position;
-		BallType type = sphere.GetComponent<Clickable>().type;
-		currentBallTypes.Remove(type);
-		Destroy(sphere);
+		BallType type = sphere.GetComponent<Clickable>().type;		        
 		
-		if (type == backgroundType) {
-			if(currentBallTypes.Count > 0)
-				SetBackgroundColor();
-			else
-				Application.LoadLevel ("main_menu");
-		} else {
+		if (type == backgroundType)
+        {
+            currentBallTypes.Remove(type);
+            Destroy(sphere);
+            ballCount--;
+            if (currentBallTypes.Count > 0)
+            {
+                SetBackgroundColor();
+            }
+            else
+            {
+                SceneManager.LoadScene("main_menu");
+            }
+        }
+        else if (ballCount < 30)
+        {
 			SpawnBall(position, type);
 			SpawnBall(position, type);
+            ballCount += 2;
 		}
-	}
+        ballCounter.text = "Balls left:" + ballCount;
+    }
 
 	void SetBackgroundColor()
 	{
@@ -99,14 +116,14 @@ public class LevelManager : MonoBehaviour {
 			new Vector3(-myWorld.x, -myWorld.y, 0),
 			new Vector3(myWorld.x, myWorld.y - menuBarHeight, 0));
 			
-		background.transform.localScale = new Vector3(myWorld.x*2, (myWorld.y - menuBarHeight * 0.5f)*2, 1.0f);
-		background.transform.position = new Vector3(0, -(menuBarHeight * 0.5f), 6.5f);
+		//background.transform.localScale = new Vector3(myWorld.x*2, (myWorld.y - menuBarHeight * 0.5f)*2, 1.0f);
+		//background.transform.position = new Vector3(0, -(menuBarHeight * 0.5f), 6.5f);
 		
-		menuBar.transform.localScale = new Vector3(myWorld.x*2, menuBarHeight, 1.0f);
-		menuBar.transform.position = new Vector3(0, gameBoard.max.y + menuBarHeight * 0.5f, 6.5f);
+		//menuBar.transform.localScale = new Vector3(myWorld.x*2, menuBarHeight, 1.0f);
+		//menuBar.transform.position = new Vector3(0, gameBoard.max.y + menuBarHeight * 0.5f, 6.5f);
 		
-		menuButton.transform.position = new Vector3(gameBoard.max.x - 1, menuBar.transform.position.y);
-		menuButton.transform.localScale = new Vector3(0.2f, 0.2f);
+		//menuButton.transform.position = new Vector3(gameBoard.max.x - 1, menuBar.transform.position.y);
+		//menuButton.transform.localScale = new Vector3(0.2f, 0.2f);
 		
 		gameObject.GetComponent<EdgeCollider2D>().points = new Vector2[] {
 			new Vector2 (gameBoard.min.x, gameBoard.min.y),
@@ -116,7 +133,8 @@ public class LevelManager : MonoBehaviour {
 			new Vector2 (gameBoard.min.x, gameBoard.min.y)};
 	}
 	
-	public void menuButtonClicked() {
+	public void menuButtonClicked()
+    {
 		isPause = !isPause;
 		if (isPause) {
 			Time.timeScale = 0;
@@ -125,8 +143,10 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 	
-	void OnGUI() {
-		if (isPause) {
+	void OnGUI()
+    {
+		if (isPause)
+        {
 			Vector3 leftTop = Camera.main.WorldToScreenPoint(new Vector3(gameBoard.min.x, gameBoard.min.y + menuBarHeight));
 			Vector3 rightBottom = Camera.main.WorldToScreenPoint(new Vector3(gameBoard.max.x, gameBoard.max.y + menuBarHeight));
 			GUI.Window(
@@ -137,7 +157,8 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 	
-	void displayPauseMenu(int windowID) {
+	void displayPauseMenu(int windowID)
+    {
 		//TODO pause menu contents
 	}
 }

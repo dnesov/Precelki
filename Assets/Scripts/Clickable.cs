@@ -13,10 +13,8 @@ public class Clickable : MonoBehaviour {
 	}
 	
 	public void SetSprite(Sprite sprite)
-	{
-		//transform.bounds.size.Set(transform.localScale.x, transform.localScale.y, transform.localScale.z);
-		transform.localScale = GetComponent<CircleCollider2D>().transform.localScale;
-		//sprite.bounds.size.Set(GetComponent<CircleCollider2D>().bounds.size.x, GetComponent<CircleCollider2D>().bounds.size.y, GetComponent<CircleCollider2D>().bounds.size.z); //= GetComponent<CircleCollider2D>().bounds;
+	{		
+		transform.localScale = GetComponent<CircleCollider2D>().transform.localScale;	
 		GetComponent<SpriteRenderer>().sprite = sprite;
 	}
 
